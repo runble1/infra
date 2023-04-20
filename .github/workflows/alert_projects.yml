@@ -24,7 +24,7 @@ jobs:
             const issueTitle = `コードスキャンアラート: ${alert.rule.name}`;
             const issueBody = `次のコードスキャンアラートを処理してください:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
 
-            // Search for existing issue
+            // 既存の問題を検索
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -37,7 +37,7 @@ jobs:
 
             if (alert.state === "open") {
               if (existingIssue) {
-                // Update existing issue
+                // 既存の問題を更新
                 await github.rest.issues.update({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -45,7 +45,7 @@ jobs:
                   body: issueBody,
                 });
               } else {
-                // Create new issue
+                // 新しい問題を作成
                 await github.rest.issues.create({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -56,7 +56,7 @@ jobs:
               }
             } else if (alert.state === "fixed" || alert.state === "dismissed") {
               if (existingIssue) {
-                // Close existing issue
+                // 既存の問題を閉じる
                 await github.rest.issues.update({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
