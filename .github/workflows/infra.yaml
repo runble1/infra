@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+# 連続pushした場合、前のジョブをキャンセルする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   # AssumeRoleされるロールのARN
   IAM_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-open-id-connect-role

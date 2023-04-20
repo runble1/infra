@@ -8,6 +8,11 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# 連続pushした場合、前のジョブをキャンセルする
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   trivy:
     if: ${{ !contains(github.event.head_commit.message, '[skip security]') }}
@@ -38,3 +43,10 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
           #category: results
+
+      - name: Convert SARIF to GitHub Issues
+        uses: geekygirlsarah/sarif-to-issue@v1
+        with:
+          input_file: "trivy-results.sarif"
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          project_column: 123456 # Replace with your GitHub Projects column ID
