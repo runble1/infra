@@ -6,9 +6,9 @@ on:
       - main
 
 # 連続pushした場合、前のジョブをキャンセルする
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
   security:
