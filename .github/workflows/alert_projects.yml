@@ -1,15 +1,15 @@
 name: Code Scanning to Projects
 
 on:
-  code_scanning_alert:
-    types:
-      - appeared
-      - fixed
-      - closed
-  #  workflow_run:
-  #    workflows: ["Code Scanning"]
+  #  code_scanning_alert:
   #    types:
-  #     - completed
+  #      - appeared
+  #      - fixed
+  #      - closed
+  workflow_run:
+    workflows: ["Code Scanning"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
@@ -19,18 +19,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: アラートの状態で問題を更新
+      - name: Handle Code Scanning Alerts
         uses: actions/github-script@v6
         with:
           script: |
-            console.log(context.payload);
-            const { alert, repository } = context.payload;
-            const repo = await github.rest.repos.get(context.repo);
-
-            console.log(context.payload);
-
-            const issueTitle = `コードスキャンアラート: ${alert.rule.name}`;
-            const issueBody = `次のコードスキャンアラートを処理してください:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
+            // Code Scanning アラートを取得する
+            const alerts = await github.rest.codeScanning.listAlertsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
 
             // 既存の問題を検索
             const issues = await github.rest.issues.listForRepo({
@@ -38,39 +35,44 @@ jobs:
               repo: context.repo.repo,
               state: "all",
               labels: ["code scanning"],
-              creator: repo.data.owner.login,
+              creator: context.repo.owner,
             });
 
-            const existingIssue = issues.data.find(issue => issue.title === issueTitle);
+            for (const alert of alerts.data) {
+              const issueTitle = `Code Scanning Alert: ${alert.rule.name}`;
+              const issueBody = `Please handle the following code scanning alert:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
 
-            if (alert.state === "open") {
-              if (existingIssue) {
-                // 既存の問題を更新
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: existingIssue.number,
-                  body: issueBody,
-                });
-              } else {
-                // 新しい問題を作成
-                await github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: issueTitle,
-                  body: issueBody,
-                  labels: ["code scanning"],
-                });
-              }
-            } else if (alert.state === "fixed" || alert.state === "dismissed") {
-              if (existingIssue) {
-                // 既存の問題を閉じる
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: existingIssue.number,
-                  state: "closed",
-                });
+              const existingIssue = issues.data.find(issue => issue.title === issueTitle);
+
+              if (alert.state === "open") {
+                if (existingIssue) {
+                  // 既存の問題を更新
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: existingIssue.number,
+                    body: issueBody,
+                  });
+                } else {
+                  // 新しい問題を作成
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issueTitle,
+                    body: issueBody,
+                    labels: ["code scanning"],
+                  });
+                }
+              } else if (alert.state === "fixed" || alert.state === "dismissed") {
+                if (existingIssue) {
+                  // 既存の問題を閉じる
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: existingIssue.number,
+                    state: "closed",
+                  });
+                }
               }
             }
 
