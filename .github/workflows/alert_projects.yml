@@ -18,10 +18,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            console.log(context.payload);
             const { alert, repository } = context.payload;
             const repo = await github.rest.repos.get(context.repo);
 
-            console.log(alert);
+            console.log(context.payload);
 
             const issueTitle = `コードスキャンアラート: ${alert.rule.name}`;
             const issueBody = `次のコードスキャンアラートを処理してください:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
