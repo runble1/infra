@@ -1,4 +1,4 @@
-name: Code Scanning Slack Notification
+name: Code Scanning to Projects
 
 on:
   workflow_run:
@@ -11,8 +11,8 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
-      - name: Terraform Format
+      - name: Check
         id: fmt
         run: |
-          echo ${{ job.status }}
-          echo ${{ github.event.pull_request.html_url || github.event.head_commit.url }}
+          echo "${{ job.status }}"
+          echo '${{ github.event.pull_request.html_url || github.event.head_commit.url }}'
