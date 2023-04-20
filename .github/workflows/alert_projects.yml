@@ -11,11 +11,60 @@ jobs:
   slack_notification:
     runs-on: ubuntu-latest
     steps:
-      - name: Check
-        id: fmt
-        run: |
-          echo "${{ job.status }}"
-          echo '${{ github.event.pull_request.html_url || github.event.head_commit.url }}'
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: アラートの状態で問題を更新
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { alert, repository } = context.payload;
+            const repo = await github.rest.repos.get(context.repo);
+
+            const issueTitle = `コードスキャンアラート: ${alert.rule.name}`;
+            const issueBody = `次のコードスキャンアラートを処理してください:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
+
+            // Search for existing issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "all",
+              labels: ["code scanning"],
+              creator: repo.data.owner.login,
+            });
+
+            const existingIssue = issues.data.find(issue => issue.title === issueTitle);
+
+            if (alert.state === "open") {
+              if (existingIssue) {
+                // Update existing issue
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  body: issueBody,
+                });
+              } else {
+                // Create new issue
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: issueTitle,
+                  body: issueBody,
+                  labels: ["code scanning"],
+                });
+              }
+            } else if (alert.state === "fixed" || alert.state === "dismissed") {
+              if (existingIssue) {
+                // Close existing issue
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingIssue.number,
+                  state: "closed",
+                });
+              }
+            }
 
       - name: Post to a Slack channel
         id: slack
