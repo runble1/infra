@@ -27,7 +27,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: modules envs
+          file: modules
           #args: --severity-threshold=high
 
       - name: Upload result to GitHub Code Scanning
