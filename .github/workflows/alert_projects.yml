@@ -1,4 +1,4 @@
-name: Code Scanning to Projects
+name: Code Scanning to Issues
 
 on:
   #  code_scanning_alert:
@@ -12,6 +12,14 @@ on:
       - completed
   workflow_dispatch:
 
+permissions:
+  actions: read
+  checks: read
+  contents: read
+  issues: write
+  metadata: read
+  security-events: read
+
 jobs:
   alert_handling:
     runs-on: ubuntu-latest
@@ -19,34 +27,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Handle Code Scanning Alerts
+      - name: Create/update issues from Code Scanning alerts
         uses: actions/github-script@v6
         with:
           script: |
-            // Code Scanning アラートを取得する
             const alerts = await github.rest.codeScanning.listAlertsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
 
-            // 既存の問題を検索
-            const issues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: "all",
-              labels: ["code scanning"],
-              creator: context.repo.owner,
-            });
-
             for (const alert of alerts.data) {
               const issueTitle = `Code Scanning Alert: ${alert.rule.name}`;
-              const issueBody = `Please handle the following code scanning alert:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
+              const issueBody = `Please address the following Code Scanning alert:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
+
+              const issues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                labels: ["code scanning"],
+              });
 
               const existingIssue = issues.data.find(issue => issue.title === issueTitle);
 
               if (alert.state === "open") {
                 if (existingIssue) {
-                  // 既存の問題を更新
                   await github.rest.issues.update({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -54,7 +58,6 @@ jobs:
                     body: issueBody,
                   });
                 } else {
-                  // 新しい問題を作成
                   await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
@@ -65,7 +68,6 @@ jobs:
                 }
               } else if (alert.state === "fixed" || alert.state === "dismissed") {
                 if (existingIssue) {
-                  // 既存の問題を閉じる
                   await github.rest.issues.update({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
