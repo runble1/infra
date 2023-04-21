@@ -30,6 +30,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const projectId = "3";
+
             const alerts = await github.rest.codeScanning.listAlertsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -57,12 +59,18 @@ jobs:
                     body: issueBody,
                   });
                 } else {
-                  await github.rest.issues.create({
+                  const newIssue = await github.rest.issues.create({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     title: issueTitle,
                     body: issueBody,
                     labels: ["code scanning"],
+                  });
+                  
+                  await github.rest.projects.createCard({
+                    column_id: projectId,
+                    content_id: newIssue.data.id,
+                    content_type: "Issue"
                   });
                 }
               } else if (alert.state === "fixed" || alert.state === "dismissed") {
