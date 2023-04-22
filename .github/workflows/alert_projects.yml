@@ -19,6 +19,10 @@ permissions:
   issues: write
   security-events: read
 
+env:
+  # AssumeRoleされるロールのARN
+  PROJECT_ID: "3"
+
 jobs:
   alert_handling:
     runs-on: ubuntu-latest
@@ -26,12 +30,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Get project column ID
+        id: get_project_column_id
+        run: |
+          project_column_id=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/projects/${{ env.PROJECT_ID }}/columns | jq '.[0].id')
+          echo "project_column_id=$project_column_id" >> $GITHUB_ENV
+
       - name: Create/update issues from Code Scanning alerts
         uses: actions/github-script@v6
         with:
           script: |
-            const projectId = "3";
-
+            const columnId = "${{ env.project_column_id }}";
             const alerts = await github.rest.codeScanning.listAlertsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -68,7 +77,7 @@ jobs:
                   });
                   
                   await github.rest.projects.createCard({
-                    column_id: projectId,
+                    column_id: columnId,
                     content_id: newIssue.data.id,
                     content_type: "Issue"
                   });
