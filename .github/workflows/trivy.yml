@@ -35,7 +35,7 @@ jobs:
           output: "trivy-results.sarif"
           exit-code: "0" # 0の場合、脆弱性が見つかっても終了しない
           ignore-unfixed: true
-          severity: "CRITICAL,HIGH"
+          #severity: "CRITICAL,HIGH"
           limit-severities-for-sarif: true # falseの場合、全てのseverityが出力される
 
       - name: Upload Trivy scan results to GitHub Security tab
