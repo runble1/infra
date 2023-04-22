@@ -13,12 +13,25 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
-  checks: read
-  contents: read
+  #actions: read
+  #checks: read
+  #contents: read
+  #issues: write
+  #security-events: read
+  #repository-projects: write
+  actions: write
+  checks: write
+  contents: write
+  deployments: write
+  id-token: write
   issues: write
-  security-events: read
+  discussions: write
+  packages: write
+  pages: write
+  pull-requests: write
   repository-projects: write
+  security-events: write
+  statuses: write
 
 env:
   PROJECT_ID: "3"
