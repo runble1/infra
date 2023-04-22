@@ -18,9 +18,9 @@ permissions:
   contents: read
   issues: write
   security-events: read
+  repository-projects: write
 
 env:
-  # AssumeRoleされるロールのARN
   PROJECT_ID: "3"
 
 jobs:
