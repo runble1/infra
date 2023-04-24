@@ -47,8 +47,8 @@ jobs:
 
       - name: Authenticate with GitHub CLI
         run: |
-          gh auth login --with-token ${{ secrets.GITHUB_TOKEN }}
-          gh auth refresh -s project --with-token ${{ secrets.GITHUB_TOKEN }}
+          gh auth login
+          gh auth refresh -s project
 
       - name: Create/update issues from Code Scanning alerts
         env:
