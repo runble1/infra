@@ -7,7 +7,7 @@ on:
   #      - fixed
   #      - closed
   workflow_run:
-    workflows: ["Code Scanning", "trivy", "Snyk IaC"]
+    workflows: ["Code Scanning", "trivy"]
     types:
       - completed
   workflow_dispatch:
@@ -46,13 +46,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Authenticate with GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh auth login
           gh auth refresh -s project
 
       - name: Create/update issues from Code Scanning alerts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open" or .status == "fixed" or .status == "closed")')
 
