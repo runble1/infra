@@ -45,12 +45,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Authenticate with GitHub CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh auth refresh -s project --hostname github.com --with-token ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create/update issues from Code Scanning alerts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
