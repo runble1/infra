@@ -10,8 +10,6 @@ on:
     workflows: ["Code Scanning", "trivy", "Snyk IaC"]
     types:
       - completed
-  code_scanning_alert:
-    types: [appeared, fixed, closed]
   workflow_dispatch:
 
 permissions:
