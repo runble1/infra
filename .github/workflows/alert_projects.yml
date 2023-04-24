@@ -7,9 +7,11 @@ on:
   #      - fixed
   #      - closed
   workflow_run:
-    workflows: ["Code Scanning"]
+    workflows: ["Code Scanning", "trivy", "Snyk IaC"]
     types:
       - completed
+  code_scanning_alert:
+    types: [appeared, fixed, closed]
   workflow_dispatch:
 
 permissions:
@@ -34,7 +36,9 @@ permissions:
   statuses: write
 
 env:
-  PROJECT_ID: "3"
+  PROJECT_NAME: infra-kanban
+  REPO_OWNER: runble1
+  REPO_NAME: infra
 
 jobs:
   alert_handling:
@@ -43,69 +47,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Get project column ID
-        id: get_project_column_id
+      - name: Authenticate with GitHub CLI
         run: |
-          project_column_id=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/projects/${{ env.PROJECT_ID }}/columns | jq '.[0].id')
-          echo "project_column_id=$project_column_id" >> $GITHUB_ENV
+          gh auth login --with-token ${{ secrets.GITHUB_TOKEN }}
+          gh auth refresh -s project --with-token ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create/update issues from Code Scanning alerts
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const columnId = "${{ env.project_column_id }}";
-            const alerts = await github.rest.codeScanning.listAlertsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open" or .status == "fixed" or .status == "closed")')
 
-            for (const alert of alerts.data) {
-              const issueTitle = `Code Scanning Alert: ${alert.rule.name}`;
-              const issueBody = `Please address the following Code Scanning alert:\n\n- [ ] ${alert.rule.description} (${alert.html_url})`;
+          for alert in "${alerts[@]}"; do
+            alert_id=$(echo "$alert" | jq -r '.id')
+            rule_name=$(echo "$alert" | jq -r '.rule.name')
+            alert_url=$(echo "$alert" | jq -r '.html_url')
+            state=$(echo "$alert" | jq -r '.status')
 
-              const issues = await github.rest.issues.listForRepo({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: "all",
-                labels: ["code scanning"],
-              });
+            issue_title="Code Scanning Alert: $rule_name"
+            issue_body="Please address the following Code Scanning alert:\n\n- [ ] $rule_name ($alert_url)"
 
-              const existingIssue = issues.data.find(issue => issue.title === issueTitle);
+            if [[ "$state" == "open" ]]; then
+              existing_issue_number=$(gh issue list --label "code scanning" --search "$issue_title" --json number -q ".[0].number")
 
-              if (alert.state === "open") {
-                if (existingIssue) {
-                  await github.rest.issues.update({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: existingIssue.number,
-                    body: issueBody,
-                  });
-                } else {
-                  const newIssue = await github.rest.issues.create({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    title: issueTitle,
-                    body: issueBody,
-                    labels: ["code scanning"],
-                  });
-                  
-                  await github.rest.projects.createCard({
-                    column_id: columnId,
-                    content_id: newIssue.data.id,
-                    content_type: "Issue"
-                  });
-                }
-              } else if (alert.state === "fixed" || alert.state === "dismissed") {
-                if (existingIssue) {
-                  await github.rest.issues.update({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: existingIssue.number,
-                    state: "closed",
-                  });
-                }
-              }
-            }
+              if [[ "$existing_issue_number" ]]; then
+                gh issue update "$existing_issue_number" --body "$issue_body"
+              else
+                gh issue create --title "$issue_title" --body "$issue_body" --label "code scanning"
+              fi
+            elif [[ "$state" == "fixed" || "$state" == "closed" ]]; then
+              existing_issue_number=$(gh issue list --label "code scanning" --search "$issue_title" --json number -q ".[0].number")
+
+              if [[ "$existing_issue_number" ]]; then
+                gh issue update "$existing_issue_number" --state closed
+              fi
+            fi
+          done
 
       - name: Post to a Slack channel
         id: slack
