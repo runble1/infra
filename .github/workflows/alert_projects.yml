@@ -47,12 +47,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: auth project
+        run: gh auth refresh -s project
+
       - name: Output alerts
         run: |
           alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open")')
+          echo "aaa"
           echo "$alerts"
 
-      - name: Create/update issues from Code Scanning alerts
+      - name: Create issues from Code Scanning alerts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
