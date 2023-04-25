@@ -50,8 +50,8 @@ jobs:
       - name: Auth project
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run:
-          #gh auth refresh -s project --hostname github.com
+        run: |
+          gh auth refresh -s project --hostname github.com
           gh issue create --title "Issue report" --body "issues body" --repo runble1/infra --project infra-kanban
 
       - name: Output alerts
