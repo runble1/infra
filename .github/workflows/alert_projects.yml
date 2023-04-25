@@ -41,13 +41,13 @@ env:
 jobs:
   alert_handling:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Create/update issues from Code Scanning alerts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open" or .status == "fixed" or .status == "closed")')
 
@@ -66,7 +66,7 @@ jobs:
               if [[ "$existing_issue_number" ]]; then
                 gh issue update "$existing_issue_number" --body "$issue_body"
               else
-                gh issue create --title "$issue_title" --body "$issue_body" --label "code scanning"
+                gh issue create --title "$issue_title" --body "$issue_body" --label "code scanning" --project ${{ env.PROJECT_NAME }}}
               fi
             elif [[ "$state" == "fixed" || "$state" == "closed" ]]; then
               existing_issue_number=$(gh issue list --label "code scanning" --search "$issue_title" --json number -q ".[0].number")

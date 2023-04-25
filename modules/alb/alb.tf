@@ -133,3 +133,26 @@ resource "aws_security_group_rule" "alb2_http" {
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
+
+resource "aws_security_group" "alb3" {
+  name   = "${var.env}-${var.service}-alb-sg"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb-sg"
+  }
+}
