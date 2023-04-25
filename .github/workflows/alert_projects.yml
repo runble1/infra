@@ -48,7 +48,7 @@ jobs:
       - name: Refresh GitHub CLI authentication
         run: |
           gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          gh auth refresh --scopes write:org,read:user,repo,write:discussion,write:packages,workflow,write:repo_hook --hostname github.com
+          gh auth refresh --scopes project --hostname github.com
 
       - name: Create Issue
         id: create_issue
