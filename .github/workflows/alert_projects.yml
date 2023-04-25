@@ -52,7 +52,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           #gh auth refresh -s project --hostname github.com
-          gh issue create --title "$issue_title" --body "body" --label "code scanning" --project ${{ env.PROJECT_NAME }}
+          gh issue create --title "issue_title" --body "body" --label "code scanning" --project ${{ env.PROJECT_NAME }}
 
       - name: Output alerts
         run: |
