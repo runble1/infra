@@ -46,7 +46,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Refresh GitHub CLI authentication
-        run: gh auth refresh --scopes read:org,read:user,repo,write:discussion,write:packages,read:registry,workflow,write:repo_hook --hostname github.com
+        run: |
+          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
+          gh auth refresh --scopes read:org,read:user,repo,write:discussion,write:packages,read:registry,workflow,write:repo_hook --hostname github.com
 
       - name: Create Issue
         id: create_issue
