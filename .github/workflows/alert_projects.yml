@@ -41,20 +41,18 @@ env:
 jobs:
   alert_handling:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Refresh GitHub CLI authentication
-        run: |
-          gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
-          gh auth refresh --scopes project --hostname github.com
 
       - name: Create Issue with project
         id: create_issue
         run: |
           gh issue create --title "Issue report" --body "issues body" --repo ${{ env.REPO_OWNER }}/${{ env.REPO_NAME }} --project infra-kanban
-          echo "issue_number=$issue_number" >> $
+          #echo "issue_number=$issue_number" >> $
 
       - name: Output alerts
         run: |
