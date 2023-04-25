@@ -47,7 +47,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Output alerts
+        run: |
+          alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open")')
+          echo "$alerts"
+
       - name: Create/update issues from Code Scanning alerts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           IFS=$'\n' read -ra alerts <<< "$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open")')"
 

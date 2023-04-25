@@ -109,54 +109,6 @@ resource "aws_security_group_rule" "alb_http" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group" "alb2" {
-  name   = "${var.env}-${var.service}-alb-sg"
-  vpc_id = var.vpc_id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb-sg"
-  }
-}
-
-resource "aws_security_group_rule" "alb2_http" {
-  from_port         = 80 //80から
-  to_port           = 80 //80までアクセス許可
-  protocol          = "tcp"
-  security_group_id = aws_security_group.alb2.id
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group" "alb3" {
-  name   = "${var.env}-${var.service}-alb-sg"
-  vpc_id = var.vpc_id
-
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb-sg"
-  }
-}
-
 resource "aws_security_group" "alb4" {
   name   = "${var.env}-${var.service}-alb4-sg"
   vpc_id = var.vpc_id
@@ -177,5 +129,28 @@ resource "aws_security_group" "alb4" {
 
   tags = {
     Name = "${var.env}-${var.service}-alb4-sg"
+  }
+}
+
+resource "aws_security_group" "alb5" {
+  name   = "${var.env}-${var.service}-alb5-sg"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb5-sg"
   }
 }
