@@ -129,7 +129,7 @@ resource "aws_security_group_rule" "alb2_http" {
   from_port         = 80 //80から
   to_port           = 80 //80までアクセス許可
   protocol          = "tcp"
-  security_group_id = aws_security_group.alb.id
+  security_group_id = aws_security_group.alb2.id
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
