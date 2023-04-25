@@ -47,11 +47,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Auth project
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Refresh GitHub CLI authentication
+        run: gh auth refresh --scopes read:org,read:user,repo,write:discussion,write:packages,read:registry,workflow,write:repo_hook --hostname github.com
+
+      - name: Create Issue
+        id: create_issue
         run: |
-          gh issue create --title "Issue report" --body "issues body" --repo runble1/infra --project infra-kanban
+          issue_number=$(gh issue create --title "Issue report" --body "issues body" --repo ${{ env.REPO_OWNER }}/${{ env.REPO_NAME }} --project infra-kanban --json number -q '.number')
+          echo "issue_number=$issue_number" >> $
 
       - name: Output alerts
         run: |
