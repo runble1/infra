@@ -53,7 +53,7 @@ jobs:
       - name: Create Issue with project
         id: create_issue
         run: |
-          issue_number=$(gh issue create --title "Issue report" --body "issues body" --repo ${{ env.REPO_OWNER }}/${{ env.REPO_NAME }} --project infra-kanban --json number -q '.number')
+          gh issue create --title "Issue report" --body "issues body" --repo ${{ env.REPO_OWNER }}/${{ env.REPO_NAME }} --project infra-kanban
           echo "issue_number=$issue_number" >> $
 
       - name: Output alerts
