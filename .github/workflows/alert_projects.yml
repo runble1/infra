@@ -51,6 +51,6 @@ jobs:
       - uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FEATURE_DATA: ${{ github.event.inputs.feature }} # パラメータの受け渡し
+          #FEATURE_DATA: ${{ github.event.inputs.feature }} # パラメータの受け渡し
         with:
           filename: .github/ISSUE_TEMPLATE.md
