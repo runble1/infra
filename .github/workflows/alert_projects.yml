@@ -48,55 +48,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Create Issue with project
-        id: create_issue
-        run: |
-          gh issue create --title "Issue report" --body "issues body" --repo ${{ env.REPO_OWNER }}/${{ env.REPO_NAME }} --project infra-kanban
-          #echo "issue_number=$issue_number" >> $
-
-      - name: Output alerts
-        run: |
-          alerts=$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open")')
-          echo "aaa"
-          echo "$alerts"
-
-      - name: Create issues from Code Scanning alerts
+      - uses: JasonEtco/create-an-issue@v2
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          IFS=$'\n' read -ra alerts <<< "$(gh api -X GET /repos/${{ github.repository }}/code-scanning/alerts --jq '.[] | select(.status == "open")')"
-
-          for alert in "${alerts[@]}"; do
-            rule_name=$(echo "$alert" | jq -r '.rule.name')
-            alert_url=$(echo "$alert" | jq -r '.html_url')
-
-            issue_title="Code Scanning Alert: $rule_name"
-            issue_body="Please address the following Code Scanning alert:\n\n- [ ] $rule_name ($alert_url)"
-
-            existing_issue_number=$(gh issue list --label "code scanning" --search "$issue_title" --json number -q ".[0].number")
-
-            if [[ -z "$existing_issue_number" ]]; then
-              gh issue create --title "$issue_title" --body "$issue_body" --label "code scanning" --project ${{ env.PROJECT_NAME }}
-            fi
-          done
-
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.23.0
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FEATURE_DATA: ${{ github.event.inputs.feature }} # パラメータの受け渡し
         with:
-          channel-id: ${{ secrets.TF_VAR_SLACK_CHANNEL_ID }}
-          payload: |
-            {
-              "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          filename: .github/ISSUE_TEMPLATE.md
