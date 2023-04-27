@@ -63,7 +63,13 @@ jobs:
 
       - name: Format Code Scanning Results
         run: |
-          formatted_results=$(echo "${{ steps.get_results.outputs.results }}" | jq -r '.[] | "- [ ] Rule: \(.rule.id)\n  - Severity: \(.rule.severity)\n  - Description: \(.rule.description)\n\n"')
+          input_data="${{ steps.get_results.outputs.results }}"
+          if ! echo "$input_data" | jq -e . >/dev/null 2>&1; then
+            echo "Invalid JSON input data:"
+            echo "$input_data"
+            exit 1
+          fi
+          formatted_results=$(echo "$input_data" | jq -r '.[] | "- [ ] Rule: \(.rule.id)\n  - Severity: \(.rule.severity)\n  - Description: \(.rule.description)\n\n"')
           echo "FORMATTED_RESULTS=$formatted_results" >> $GITHUB_ENV
 
       - name: Create Issue Template
