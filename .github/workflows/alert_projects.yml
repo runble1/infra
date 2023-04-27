@@ -59,11 +59,17 @@ jobs:
                          -H "Accept: application/vnd.github+json" \
                          -H "X-GitHub-Api-Version: 2022-11-28" \
                          "https://api.github.com/repos/${{ env.REPO_OWNER}}/${{ env.REPO_NAME }}/code-scanning/alerts")
-          echo "::set-output name=results::$results"
+          # Ensure the output is a JSON array
+          if ! echo "$results" | jq -e . >/dev/null 2>&1; then
+            echo "Invalid JSON data received from API:"
+            echo "$results"
+            exit 1
+          fi
+          echo "RESULTS=[$results]" >> $GITHUB_ENV
 
       - name: Format Code Scanning Results
         run: |
-          input_data="${{ steps.get_results.outputs.results }}"
+          input_data="${{ env.RESULTS }}"
           if ! echo "$input_data" | jq -e . >/dev/null 2>&1; then
             echo "Invalid JSON input data:"
             echo "$input_data"
