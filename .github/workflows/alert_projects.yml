@@ -65,7 +65,7 @@ jobs:
             echo "$results"
             exit 1
           fi
-          echo "RESULTS=[$results]" >> $GITHUB_ENV
+          echo "RESULTS=$results" >> "$GITHUB_ENV"
 
       - name: Format Code Scanning Results
         run: |
@@ -76,7 +76,7 @@ jobs:
             exit 1
           fi
           formatted_results=$(echo "$input_data" | jq -r '.[] | "- [ ] Rule: \(.rule.id)\n  - Severity: \(.rule.severity)\n  - Description: \(.rule.description)\n\n"')
-          echo "FORMATTED_RESULTS=$formatted_results" >> $GITHUB_ENV
+          echo "FORMATTED_RESULTS=$formatted_results" >> "$GITHUB_ENV"
 
       - name: Create Issue Template
         run: |
