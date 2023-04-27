@@ -48,9 +48,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: JasonEtco/create-an-issue@v2
+      - name: Get Code Scanning Results
+        id: get_results
+        run: |
+          # Replace OWNER and REPO with your actual repository owner and name
+          results=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                         -H "Accept: application/vnd.github+json" \
+                         "https://api.github.com/repos/OWNER/REPO/code-scanning/alerts?state=open")
+          echo "::set-output name=results::$results"
+
+      - name: Create Issue Template
+        run: |
+          # Create the template file with the results
+          echo "---" > issue_template.md
+          echo "title: Code Scanning Results" >> issue_template.md
+          echo "labels: code scanning" >> issue_template.md
+          echo "---" >> issue_template.md
+          echo "Code Scanning Results:" >> issue_template.md
+          echo "${{ steps.get_results.outputs.results }}" >> issue_template.md
+
+      - name: Create Issue
+        uses: JasonEtco/create-an-issue@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #FEATURE_DATA: ${{ github.event.inputs.feature }} # パラメータの受け渡し
-        with:
-          filename: .github/ISSUE_TEMPLATE.md
+          ISSUE_TEMPLATE: issue_template.md
+        #with:
+        #  filename: .github/ISSUE_TEMPLATE.md
