@@ -63,7 +63,7 @@ jobs:
 
       - name: Format Code Scanning Results
         run: |
-          formatted_results=$(echo '${{ steps.get_results.outputs.results }}' | jq -r '.[] | "- [ ] Rule: \(.rule.id)\n  - Severity: \(.rule.severity)\n  - Description: \(.rule.description)\n\n"')
+          formatted_results=$(echo "${{ steps.get_results.outputs.results }}" | jq -r '.[] | "- [ ] Rule: \(.rule.id)\n  - Severity: \(.rule.severity)\n  - Description: \(.rule.description)\n\n"')
           echo "FORMATTED_RESULTS=$formatted_results" >> $GITHUB_ENV
 
       - name: Create Issue Template
