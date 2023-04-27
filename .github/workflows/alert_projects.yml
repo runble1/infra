@@ -54,7 +54,7 @@ jobs:
           # Replace OWNER and REPO with your actual repository owner and name
           results=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
                          -H "Accept: application/vnd.github+json" \
-                         "https://api.github.com/repos/OWNER/REPO/code-scanning/alerts?state=open")
+                         "https://api.github.com/repos/${{ secrets.REPO_OWNER}}/${{ secrets.REPO_NAME }}/code-scanning/alerts?state=open")
           echo "::set-output name=results::$results"
 
       - name: Create Issue Template
