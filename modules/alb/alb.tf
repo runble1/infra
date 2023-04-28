@@ -138,3 +138,18 @@ resource "aws_security_group" "alb8" {
     Name = "${var.env}-${var.service}-alb9-sg"
   }
 }
+
+resource "aws_security_group" "alb9" {
+  name   = "${var.env}-${var.service}-alb90-sg"
+  vpc_id = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb9-sg"
+  }
+}
