@@ -109,8 +109,8 @@ resource "aws_security_group_rule" "alb_http" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group" "alb8" {
-  name   = "${var.env}-${var.service}-alb8-sg"
+resource "aws_security_group" "alb12" {
+  name   = "${var.env}-${var.service}-alb12-sg"
   vpc_id = var.vpc_id
   egress {
     from_port   = 0
@@ -120,51 +120,6 @@ resource "aws_security_group" "alb8" {
   }
 
   tags = {
-    Name = "${var.env}-${var.service}-alb8-sg"
-  }
-}
-
-resource "aws_security_group" "alb8" {
-  name   = "${var.env}-${var.service}-alb9-sg"
-  vpc_id = var.vpc_id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb9-sg"
-  }
-}
-
-resource "aws_security_group" "alb9" {
-  name   = "${var.env}-${var.service}-alb90-sg"
-  vpc_id = var.vpc_id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb9-sg"
-  }
-}
-
-resource "aws_security_group" "alb10" {
-  name   = "${var.env}-${var.service}-alb10-sg"
-  vpc_id = var.vpc_id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb10-sg"
+    Name = "${var.env}-${var.service}-alb12-sg"
   }
 }
