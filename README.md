@@ -11,13 +11,17 @@ Auto added to project <- 追加
 ```
 
 ### Github Apps
-下記より Github Apps をインストール
+個人アカウントで Github Apps を作成
 ```
 https://github.com/settings/apps/
 ```
-インストールされたことを確認
+リポジトリ側で Apps をインストール
 ```
 https://github.com/runble1/infra/settings/installations
+```
+リポジトリで Webhook を有効化
+```
+https://github.com/runble1/infra/settings/hooks
 ```
 
 ## Deploy
