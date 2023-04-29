@@ -15,9 +15,9 @@ Auto added to project <- 追加
 ```
 https://github.com/settings/apps/
 ```
-リポジトリ側で Apps をインストール
+Github Apps から対象リポジトリへインストール
 ```
-https://github.com/runble1/infra/settings/installations
+https://github.com/settings/apps/test-code-scanning/installations
 ```
 リポジトリで Webhook を有効化
 ```
