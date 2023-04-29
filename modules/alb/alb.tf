@@ -288,3 +288,18 @@ resource "aws_security_group" "alb23" {
     Name = "${var.env}-${var.service}-alb23-sg"
   }
 }
+
+resource "aws_security_group" "alb24" {
+  name   = "${var.env}-${var.service}-alb24-sg"
+  vpc_id = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb24-sg"
+  }
+}
