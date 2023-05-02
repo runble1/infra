@@ -198,3 +198,18 @@ resource "aws_security_group" "alb45" {
     Name = "${var.env}-${var.service}-alb45-sg"
   }
 }
+
+resource "aws_security_group" "alb46" {
+  name   = "${var.env}-${var.service}-alb46-sg"
+  vpc_id = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb46-sg"
+  }
+}
