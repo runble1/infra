@@ -124,7 +124,6 @@ resource "aws_security_group" "alb50" {
   }
 }
 
-
 resource "aws_security_group" "alb51" {
   name   = "${var.env}-${var.service}-alb51-sg"
   vpc_id = var.vpc_id
@@ -137,5 +136,20 @@ resource "aws_security_group" "alb51" {
 
   tags = {
     Name = "${var.env}-${var.service}-alb51-sg"
+  }
+}
+
+resource "aws_security_group" "alb52" {
+  name   = "${var.env}-${var.service}-alb52-sg"
+  vpc_id = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb52-sg"
   }
 }
