@@ -109,21 +109,6 @@ resource "aws_security_group_rule" "alb_http" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group" "alb40" {
-  name   = "${var.env}-${var.service}-alb40-sg"
-  vpc_id = var.vpc_id
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.env}-${var.service}-alb40-sg"
-  }
-}
-
 resource "aws_security_group" "alb50" {
   name   = "${var.env}-${var.service}-alb50-sg"
   vpc_id = var.vpc_id
@@ -136,5 +121,21 @@ resource "aws_security_group" "alb50" {
 
   tags = {
     Name = "${var.env}-${var.service}-alb50-sg"
+  }
+}
+
+
+resource "aws_security_group" "alb51" {
+  name   = "${var.env}-${var.service}-alb51-sg"
+  vpc_id = var.vpc_id
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.env}-${var.service}-alb51-sg"
   }
 }
